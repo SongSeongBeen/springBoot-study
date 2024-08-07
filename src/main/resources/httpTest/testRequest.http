@@ -1,0 +1,5 @@
+### GET
+GET {{root-path}}/hello?name=spring
+
+### POST
+POST {{root-path}}/hello?name=spring
