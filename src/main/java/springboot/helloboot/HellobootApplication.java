@@ -26,11 +26,14 @@ public class HellobootApplication {
             JettyServletWebServerFactory serverFactory = new JettyServletWebServerFactory();
         */
         TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-        /*
+        /*  Servlet 기술만 사용
             Servlet을 ServletContainer에 추가
             Spring에 웹 모듈에 들어 있는 인터페이스 이므로 익명클래스를 만들어 처리
         */
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
+            //HelloController 매 요청마다 새로운 인스턴스 생성 할 필요없음
+            HelloController helloController = new HelloController();
+
             servletContext.addServlet("frontcontroller", new HttpServlet() {
                 @Override
                 protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,14 +43,23 @@ public class HellobootApplication {
                             2. 웹 요청을 직접 적으로 Request 와 Response 유연하게 처리.
                     */
 
-                    //파라미터 처리
+                    //GET "/hello"
                     if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
                         String name = req.getParameter("name");
-
+                        /*  helloController 에서 값을 꺼내는 부분은 FrontController이 담당
+                            웹MVC에서 바인딩 되는 원리는 많은 지식과 복잡하지만
+                            바인딩의 기본적인 원리는 웹 요청이 어떻게 생겼는지 알고 직접적으로 액세스하는 FrontController와 같은 코드에서
+                            이걸 처리하는 오브젝트에게 평범한 데이터 타입으로 전환해서 넘겨주는 작업
+                         */
+                        String ret = helloController.hello(name);
                         //웹 응답 처리
                         resp.setStatus(HttpStatus.OK.value());                                   //상태코드
                         resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);    //header
-                        resp.getWriter().println("Hello " + name);                               //header에 해당하는 body
+                        //FrontController 기능 분리
+                        //resp.getWriter().println("Hello " + name);                               //header에 해당하는 body
+                        resp.getWriter().println(ret);
+
+
                     } else if (req.getRequestURI().equals("/user")) {
                         //
                     } else {
