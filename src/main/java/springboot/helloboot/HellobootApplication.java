@@ -24,7 +24,21 @@ public class HellobootApplication {
 
     public static void main(String[] args) {
         //DispatcherServilet사용시 WebApplicationContext 타입을 전송
-        GenericWebApplicationContext applicationContext = new GenericWebApplicationContext();
+        GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() {
+            @Override
+            protected void onRefresh() {
+                super.onRefresh();
+
+                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+                WebServer webServer = serverFactory.getWebServer(servletContext -> {
+                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this))
+                            .addMapping("/*");
+                });
+                webServer.start();
+            }
+        };
+
+
         /*
             SpringContainer
             싱글톤 패턴 처럼 사용(하나의 객체를 재사용)
@@ -42,7 +56,7 @@ public class HellobootApplication {
              Assembler를 통해서 둘 사이의 연관관계를 주입이라는 방법을 사용해서 지정하도록
         */
         applicationContext.registerBean(SimpleHelloService.class); //HelloServiceInterface
-        applicationContext.refresh(); //초기화 object 만들어줌
+        applicationContext.refresh(); //초기화작업(Template method 패턴을 사용 Hook 메소드 주입 onRefresh)   object 만들어줌
 
         //독립실행이 가능한 Servlet Container
         /*
@@ -50,14 +64,19 @@ public class HellobootApplication {
             ex)
             JettyServletWebServerFactory serverFactory = new JettyServletWebServerFactory();
         */
-        ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+
+
+        //초기화작업(Template method 패턴을 사용 Hook 메소드 주입 onRefresh)
+        //ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
         /*  Servlet 기술만 사용
             Servlet을 ServletContainer에 추가
             Spring에 웹 모듈에 들어 있는 인터페이스 이므로 익명클래스를 만들어 처리
         */
-        WebServer webServer = serverFactory.getWebServer(new ServletContextInitializer[]{servletContext -> {
-            //DispatcherServilet으로 변경(WebApplicationContext 타입을 전송)
-            servletContext.addServlet("dispatcherServilet", new DispatcherServlet(applicationContext)
+        //DispatcherServilet으로 변경(WebApplicationContext 타입을 전송)
+        //WebServer webServer = serverFactory.getWebServer(new ServletContextInitializer[]{servletContext -> {
+        //WebServer webServer = serverFactory.getWebServer(servletContext -> {
+        //   servletContext.addServlet("dispatcherServilet"
+        //            , new DispatcherServlet(applicationContext)
             //SpringContainer 처리로 인해 주석 처리
             //HelloController 매 요청마다 새로운 인스턴스 생성 할 필요없음
             //HelloController helloController = new HelloController();
@@ -99,10 +118,11 @@ public class HellobootApplication {
 
                 } */
                 //FrontController 처리
-            ).addMapping("/*");
+         //   ).addMapping("/*");
             //}).addMapping("/hello");
-        }});
-        webServer.start();
+        //}});
+       // });
+       //webServer.start();
     }
 
 }
