@@ -1,5 +1,8 @@
 package springboot.helloboot;
 
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +28,18 @@ import java.util.Objects;
 //@RequestMapping("/hello")
 //@MyComponent  //BeanFactory Method 대신 스프링 컨테이너 컴포넌트 명시
 public class HelloController {
-    private final HelloService helloService;
+    //public class HelloController implements ApplicationContextAware {
 
-    public HelloController(HelloService helloService) {
+    private final HelloService helloService;
+    private final ApplicationContext applicationContext;
+    //생성자가 완료되는 시점까지는 초기화가 완료 되어야함 생성자를 통해서 인스턴트가 만들어지고난 후에 호출 final 사용 할 수 없다.
+    //컨테이너 입장에서는 자기 자신이긴 하지만 이 타입의 빈이 등록된 것 처럼 등록해 놓고 사용 그러므로 생성자 주입으로 변경
+    //private ApplicationContext applicationContext;
+
+
+    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
         this.helloService = helloService;
+        this.applicationContext = applicationContext;
     }
 
     //해당 어노테이션이 없으면 지금 상황에서는 view가 없는 상태(String 값을 그대로 web응답 body에 넣어서 전달하게 하는 텍스트 플레인 처리). 404 error
@@ -42,4 +53,11 @@ public class HelloController {
         //유저 요청사항 검증(Object로 던져서 null 체크)
         return helloService.sayHello(Objects.requireNonNull(name));
     }
+    /*
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        System.out.println(applicationContext);
+        this.applicationContext = applicationContext;
+    }
+    */
 }

@@ -31,6 +31,16 @@ import java.io.IOException;
 @Configuration
 @ComponentScan  //컴넌트가 붙은 클래스를 빈으로 등록
 public class HellobootApplication {
+
+    @Bean
+    public ServletWebServerFactory servletWebServerFactory() {
+        return new TomcatServletWebServerFactory();
+    }
+
+    @Bean
+    public DispatcherServlet dispatcherServlet() {
+        return new DispatcherServlet();
+    }
     /*
     //BeanFactory Method 사용 방식
     @Bean
@@ -45,16 +55,29 @@ public class HellobootApplication {
     public static void main(String[] args) {
         //Java 코드로 만든 Configuration 사용으로 인한 변경
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {
-        //GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() { //DispatcherServilet사용시 WebApplicationContext 타입을 전송
+        //GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() { //DispatcherServilet 사용시 WebApplicationContext 타입을 전송
             @Override
             protected void onRefresh() {
                 super.onRefresh();
+                ServletWebServerFactory servletWebServerFactory = this.getBean(ServletWebServerFactory.class);
+                DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
 
+                //없어도 스프링 컨테이너가 해준다.(디스패처 서블릿 type hierarchy 살펴보기 Ctrl+Shift+H)
+                //dispatcherServlet.setApplicationContext(this); //생성자 없이 생성하여 스프링 컨테이너 주입
+
+                //Bean Factory Method 재구성
+                WebServer webServer = servletWebServerFactory.getWebServer(servletContext -> {
+                   servletContext.addServlet("dispatcherServlet", dispatcherServlet)
+                           .addMapping("/*");
+                });
+                /*
                 ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
                 WebServer webServer = serverFactory.getWebServer(servletContext -> {
                     servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this) )//자기자신 참고
                             .addMapping("/*");
                 });
+
+                 */
                 webServer.start();
             }
         };
