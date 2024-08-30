@@ -11,6 +11,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,9 @@ import java.io.IOException;
 */
 
 @Configuration
+@ComponentScan  //컴넌트가 붙은 클래스를 빈으로 등록
 public class HellobootApplication {
+    /*
     //BeanFactory Method 사용 방식
     @Bean
     public HelloController helloController (HelloService helloService) {
@@ -38,7 +41,7 @@ public class HellobootApplication {
     public HelloService helloService () {
         return new SimpleHelloService();
     }
-
+    */
     public static void main(String[] args) {
         //Java 코드로 만든 Configuration 사용으로 인한 변경
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {

@@ -1,5 +1,6 @@
 package springboot.helloboot;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +20,10 @@ import java.util.Objects;
     @Controller
     스프링 부트 3에서 스프링 버전이 업데이트가 되면서 @RequestMapping만으로 DispatcherServlet이 인식하던 기능이 더 이상 지원되지 않고 @Controller까지 등록이 필요
 */
-@Controller
-@RequestMapping("/hello")
+@RestController
+//@Controller
+//@RequestMapping("/hello")
+//@MyComponent  //BeanFactory Method 대신 스프링 컨테이너 컴포넌트 명시
 public class HelloController {
     private final HelloService helloService;
 
@@ -30,8 +33,8 @@ public class HelloController {
 
     //해당 어노테이션이 없으면 지금 상황에서는 view가 없는 상태(String 값을 그대로 web응답 body에 넣어서 전달하게 하는 텍스트 플레인 처리). 404 error
     //@Rest 라는 이름이 붙으면 @ResponseBody 있따고 가정함.
-    @GetMapping
-    @ResponseBody
+    @GetMapping("/hello")
+    //@ResponseBody
     public String hello(String name) {
         //생성자 파라미터 주입 하는 방식으로 변경
         //SimpleHelloService helloService = new SimpleHelloService();
