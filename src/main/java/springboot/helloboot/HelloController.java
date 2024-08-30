@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 
 /*
-    1. DispatcherServlet은 ApplicationContext를 생서자로 받아 빈을 찾아 웹요청 처리 할수 있는 매핑 정보의 클래스를 찾는다.
-    2. 매핑에 사용할 매핑 테이블을 만들어 놓는다.
-    3. Method 레벨 까지 다 찾을려면 힘드니 @RequestMapping 어노테이션을 사용하여 클래스 레벨에 어노테이션을 추가
+    1. DispatcherServlet은 ApplicationContext를 생성자로 받아 빈을 찾아 웹요청 처리할 수 있는 매핑 정보의 클래스를 찾는다.
+    2. 매핑에 사용할 매핑테이블을 만들어 놓는다.
+    3. Method 레벨까지 다 찾을려면 힘드니 @RequestMapping 어노테이션을 사용하여 클래스 레벨에 어노테이션을 추가
     -----------------------
     @RestController 해당 어노테이션은 DispatcherServlet 하고 직접 관련은 없음
     스프링 컨테이너를 사용하는 또 다른 방법을 적용하는 시점에 필요한 어노테이션

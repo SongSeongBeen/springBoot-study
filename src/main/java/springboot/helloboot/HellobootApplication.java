@@ -10,28 +10,46 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import java.io.IOException;
+/*
+    Configuration을 사용하는 클래스가 AnnotationConfig를 이용하는 애플리케이션 컨텍스에 처음 등록된다.
+    Configuration 붙은 클래스는 BeanFactory Method를 가지는 것 이상으로 전체 애플리케이션을 구성하는데 필요한 중요한 정보를 많이 넣을 수 있다.
+*/
 
+@Configuration
 public class HellobootApplication {
+    //BeanFactory Method 사용 방식
+    @Bean
+    public HelloController helloController (HelloService helloService) {
+        return new HelloController(helloService);
+    }
+    @Bean
+    public HelloService helloService () {
+        return new SimpleHelloService();
+    }
 
     public static void main(String[] args) {
-        //DispatcherServilet사용시 WebApplicationContext 타입을 전송
-        GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() {
+        //Java 코드로 만든 Configuration 사용으로 인한 변경
+        AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {
+        //GenericWebApplicationContext applicationContext = new GenericWebApplicationContext() { //DispatcherServilet사용시 WebApplicationContext 타입을 전송
             @Override
             protected void onRefresh() {
                 super.onRefresh();
 
                 ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
                 WebServer webServer = serverFactory.getWebServer(servletContext -> {
-                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this))
+                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this) )//자기자신 참고
                             .addMapping("/*");
                 });
                 webServer.start();
@@ -50,12 +68,14 @@ public class HellobootApplication {
         //object를 직접 만들어서 넣어주는것도 가능하나 일반적으로 어떤 클래스는 사용할것인가 메타 정보를 넣어준다.
 
         /* 빈등록 */
-        applicationContext.registerBean(HelloController.class);
+        //applicationContext.registerBean(HelloController.class);
         /*
              DI - 인터페스를 중간에 두고 코드 레벨의 의존고나계를 제거 한 다음, 동적으로 스프링컨테이너 적용
              Assembler를 통해서 둘 사이의 연관관계를 주입이라는 방법을 사용해서 지정하도록
         */
-        applicationContext.registerBean(SimpleHelloService.class); //HelloServiceInterface
+        //Java 코드로 만든 Configuration 사용으로 인한 변경(클래스로 변경)
+        applicationContext.register(HellobootApplication.class);
+        //applicationContext.registerBean(SimpleHelloService.class); //HelloServiceInterface
         applicationContext.refresh(); //초기화작업(Template method 패턴을 사용 Hook 메소드 주입 onRefresh)   object 만들어줌
 
         //독립실행이 가능한 Servlet Container
