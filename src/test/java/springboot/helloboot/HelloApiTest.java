@@ -24,7 +24,7 @@ public class HelloApiTest {
         // 검증 (status code 200, header(content-type text/plain), body hello Spring)
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);    //http status에 Enum 값과 비교
         assertThat(res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).startsWith(MediaType.TEXT_PLAIN_VALUE);
-        assertThat(res.getBody()).isEqualTo("Hello Spring");
+        assertThat(res.getBody()).isEqualTo("*Hello Spring*");
     }
 
     @Test
