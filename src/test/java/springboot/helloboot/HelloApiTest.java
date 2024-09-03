@@ -26,4 +26,18 @@ public class HelloApiTest {
         assertThat(res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).startsWith(MediaType.TEXT_PLAIN_VALUE);
         assertThat(res.getBody()).isEqualTo("Hello Spring");
     }
+
+    @Test
+    void failsHelloApi() {
+        // http localhost:8080/hello?name=Spring
+        // HTTPie
+        TestRestTemplate testRest = new TestRestTemplate();
+
+        ResponseEntity<String> res =
+                testRest.getForEntity("http://localhost:8080/hello?name=", String.class);
+
+        // 검증 (status code 200, header(content-type text/plain), body hello Spring)
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
 }
