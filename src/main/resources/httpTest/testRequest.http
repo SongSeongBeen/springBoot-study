@@ -1,5 +1,5 @@
 ### GET
-GET {{root-path}}/hello?name=spring
+GET {{root-path}}/hello?name=SpringBoot
 
 ### POST
 POST {{root-path}}/hello?name=spring
